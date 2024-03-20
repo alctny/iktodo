@@ -78,10 +78,8 @@ impl Task {
 impl Display for Task {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let msg = format!(
-            "{:02} ({} ~ {:10}) {}",
+            "{:02} {}",
             self.id,
-            self.get_begin_at(),
-            self.get_end_at(),
             self.name
         );
         match self.status {
