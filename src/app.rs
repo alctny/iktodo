@@ -34,7 +34,7 @@ enum Command {
     /// 完成代办事项
     Done {
         /// 任务ID
-        id: i32,
+        id: Vec<i32>,
     },
     /// 清除所有已完成事项、过期事项
     Clean,
@@ -77,11 +77,7 @@ impl Task {
 
 impl Display for Task {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let msg = format!(
-            "{:02} {}",
-            self.id,
-            self.name
-        );
+        let msg = format!("{:02} {}", self.id, self.name);
         match self.status {
             0 => write!(f, "{}", msg.green()),
             1 => write!(f, "\x1B[9m{}\x1B[0m", msg.yellow()),
@@ -215,13 +211,20 @@ fn list_task() {
 }
 
 // 将代办事项标记为已完成
-fn done_task(id: i32) {
+fn done_task(id: Vec<i32>) {
     let conn = connect_sqlite();
-    let result = conn.execute(
-        "UPDATE task SET status = 1 WHERE id = ?1",
-        &[&id.to_string()],
-    );
-    match result {
+    let ids = id
+        .iter()
+        .map(|x| x.to_string())
+        .collect::<Vec<String>>()
+        .join(", ");
+        
+    let stat = conn.prepare(&format!("UPDATE task SET status = 1 WHERE id IN ({})", ids));
+    let mut stat = match stat {
+        Ok(stat) => stat,
+        Err(e) => panic!("Error in done task: {}", e),
+    };
+    match stat.execute([]) {
         Ok(_) => list_task(),
         Err(e) => println!("Error in mark task: {}", e),
     }
