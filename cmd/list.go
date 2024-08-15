@@ -1,8 +1,9 @@
-package main
+package cmd
 
 import (
 	"fmt"
 
+	"github.com/alctny/iktodo/db"
 	"github.com/urfave/cli/v2"
 )
 
@@ -10,7 +11,7 @@ import (
 func ListCommand() *cli.Command {
 	return &cli.Command{
 		Name:   "list",
-		Before: initDB,
+		Before: db.InitDB,
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
 				Name:    "all",
@@ -22,7 +23,7 @@ func ListCommand() *cli.Command {
 		Action: func(ctx *cli.Context) error {
 			all := ctx.IsSet("all")
 
-			ts, err := ListTask(all)
+			ts, err := db.ListTask(all)
 			if err != nil {
 				return err
 			}
