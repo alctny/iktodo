@@ -2,26 +2,27 @@ package cmd
 
 import (
 	"errors"
-	"strconv"
 
+	"github.com/alctny/iktodo/common"
 	"github.com/alctny/iktodo/db"
 	"github.com/urfave/cli/v2"
 )
 
 func DoneCommand() *cli.Command {
 	return &cli.Command{
-		Name:   "done",
-		Usage:  "set task to finished",
-		Before: db.InitDB,
-		Action: action,
+		Name:      "done",
+		Usage:     "set task to finished",
+		UsageText: "iktodo done <id1 id2 ...>",
+		Before:    db.InitDB,
+		Action:    doneAction,
 	}
 }
 
-func action(ctx *cli.Context) error {
-	idStr := ctx.Args().First()
-	id, err := strconv.ParseInt(idStr, 10, 64)
+func doneAction(ctx *cli.Context) error {
+	ids, err := common.StringsToInts(ctx.Args().Slice())
 	if err != nil {
-		return errors.Join(errors.New("id error"))
+		return errors.Join(errors.New("id errror"), err)
 	}
-	return db.DoneTask(int(id))
+
+	return db.DoneTask(ids)
 }

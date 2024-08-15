@@ -10,8 +10,11 @@ import (
 // ListCommand 构建查询任务的 command
 func ListCommand() *cli.Command {
 	return &cli.Command{
-		Name:   "list",
-		Before: db.InitDB,
+		Name:      "list",
+		Usage:     "list task",
+		UsageText: "iktodo list [option]",
+		Before:    db.InitDB,
+		Action:    listAction,
 		Flags: []cli.Flag{
 			&cli.BoolFlag{
 				Name:    "all",
@@ -19,19 +22,36 @@ func ListCommand() *cli.Command {
 				Value:   false,
 				Aliases: []string{"a"},
 			},
-		},
-		Action: func(ctx *cli.Context) error {
-			all := ctx.IsSet("all")
 
-			ts, err := db.ListTask(all)
-			if err != nil {
-				return err
-			}
-			for _, v := range ts {
-				fmt.Printf("%02d %s\n", v.ID, v.Name)
-			}
-
-			return nil
+			&cli.BoolFlag{
+				Name:    "done",
+				Usage:   "list finished task",
+				Value:   false,
+				Aliases: []string{"d"},
+			},
 		},
 	}
+}
+
+func listAction(ctx *cli.Context) error {
+	query := map[string]any{"status": 0}
+
+	if ctx.IsSet("done") {
+		query["status"] = -1
+	}
+
+	if ctx.IsSet("all") {
+		query = map[string]any{}
+	}
+
+	ts, err := db.ListTask(query)
+	if err != nil {
+		return err
+	}
+	for _, v := range ts {
+		fmt.Printf("%02d %s\n", v.ID, v.Name)
+	}
+
+	return nil
+
 }

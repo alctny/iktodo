@@ -21,6 +21,7 @@ func NewApp() *cli.App {
 			cmd.AddCommand(),
 			cmd.ListCommand(),
 			cmd.DoneCommand(),
+			cmd.RemoveCmd(),
 		},
 	}
 
