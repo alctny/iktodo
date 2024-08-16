@@ -18,10 +18,12 @@ func NewApp() *cli.App {
 		Authors:        []*cli.Author{{Name: "Alctny", Email: "ltozvxe@gmail.com"}},
 		DefaultCommand: "list",
 		Commands: []*cli.Command{
-			cmd.AddCommand(),
-			cmd.ListCommand(),
-			cmd.DoneCommand(),
+			cmd.AddCmd(),
+			cmd.ListCmd(),
+			cmd.DoneCmd(),
 			cmd.RemoveCmd(),
+			cmd.ArrgregationCmd(),
+			cmd.FindCmd(),
 		},
 	}
 

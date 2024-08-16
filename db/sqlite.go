@@ -44,10 +44,14 @@ func DeleteTask(id []int) error {
 }
 
 // ListTask 查询任务列表
-func ListTask(query map[string]any) ([]task.Task, error) {
+func ListTask(query map[string]any, limit uint, offset uint) ([]task.Task, error) {
 	var lis []task.Task
-	tx := db.Where(query).Order("create_at").Find(&lis)
-	return lis, tx.Error
+	tx := db.Where(query).Order("status DESC, create_at")
+	if limit != 0 {
+		tx = tx.Offset(int(offset)).Limit(int(limit))
+	}
+	err := tx.Find(&lis).Error
+	return lis, err
 }
 
 // DoneTask 将任务标识为完成/未完成
@@ -75,4 +79,33 @@ func DoneTask(id []int) error {
 // RemoveFinished 删除所有已完成任务
 func RemoveFinished() error {
 	return db.Model(task.Task{}).Where(task.Task{Status: -1}).Delete(nil).Error
+}
+
+func Aggregate() (*task.AggregateResult, error) {
+	var total int64
+	err := db.Model(task.Task{}).Count(&total).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var finished int64
+	err = db.Model(task.Task{}).Where(map[string]any{"status": task.StatusFinished}).Count(&finished).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var unfinish int64
+	err = db.Model(task.Task{}).Where(map[string]any{"status": task.StatusUnfinish}).Count(&unfinish).Error
+	if err != nil {
+		return nil, err
+	}
+
+	return &task.AggregateResult{Total: uint(total), Finished: uint(finished), Unfinish: uint(unfinish)}, nil
+}
+
+// Search 搜索任务
+func Search(kw string) ([]task.Task, error) {
+	var ts []task.Task
+	err := db.Model(task.Task{}).Where("name LIKE ?", "%"+kw+"%").Find(&ts).Error
+	return ts, err
 }

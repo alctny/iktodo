@@ -8,7 +8,7 @@ import (
 	"github.com/urfave/cli/v2"
 )
 
-func DoneCommand() *cli.Command {
+func DoneCmd() *cli.Command {
 	return &cli.Command{
 		Name:      "done",
 		Usage:     "set task to finished",

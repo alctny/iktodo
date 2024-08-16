@@ -16,7 +16,7 @@ func RemoveCmd() *cli.Command {
 		Before:    db.InitDB,
 		Subcommands: []*cli.Command{
 			{
-				Name:  "done",
+				Name:  "finished",
 				Usage: "remove all finished task",
 				Action: func(ctx *cli.Context) error {
 					return db.RemoveFinished()
