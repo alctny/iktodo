@@ -24,6 +24,7 @@ func NewApp() *cli.App {
 			cmd.RemoveCmd(),
 			cmd.ArrgregationCmd(),
 			cmd.FindCmd(),
+			cmd.UpdateCmd(),
 		},
 	}
 

@@ -109,3 +109,8 @@ func Search(kw string) ([]task.Task, error) {
 	err := db.Model(task.Task{}).Where("name LIKE ?", "%"+kw+"%").Find(&ts).Error
 	return ts, err
 }
+
+// UpdateTask 更新任务
+func Update(id int, m map[string]any) error {
+	return db.Model(task.Task{}).Where("id = ?", id).Updates(m).Error
+}
